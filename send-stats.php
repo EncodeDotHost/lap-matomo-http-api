@@ -36,7 +36,7 @@ function lap_matomo_http_api_head() {
     $page_title = esc_html(get_the_title());
     $user_info = get_userdata(get_current_user_id());
     $display_name = $user_info->display_name;
-    echo $display_name;
+    // echo $display_name;
 
     MatomoTracker::$URL = $url;
     $matomoTracker = new MatomoTracker( $idSite = $idsite );
