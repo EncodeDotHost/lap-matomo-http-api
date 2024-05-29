@@ -57,6 +57,13 @@ function lap_matomo_http_api_admin_init() {
     'lap_matomo_http_api_plugin',
     'lap_matomo_http_api_main'
   );
+  add_settings_field( 
+    'lap_matomo_http_api_tracking_tokenAuth',
+    'Authentication Token',
+    'lap_matomo_http_api_setting_tracking_tokenAuth',
+    'lap_matomo_http_api_plugin',
+    'lap_matomo_http_api_main'
+  );
 }
 
 // Draw the section header
@@ -84,10 +91,19 @@ function lap_matomo_http_api_setting_tracking_idsite() {
   <?php
 }
 
+function lap_matomo_http_api_setting_tracking_tokenAuth() {
+  $options = get_option( 'lap_matomo_http_api_options' );
+  $tokenAuth = (isset($options['tokenAuth'])) ? $options['tokenAuth'] : ''; // Use empty string if not set
+  ?>
+  <input type="text" name="lap_matomo_http_api_options[tokenAuth]" id="tokenAuth" value="<?php echo $tokenAuth; ?>" />
+  <?php
+}
+
 function lap_matomo_http_api_validate_options( $input ) {
 
 	// Only allow letters and spaces for the name
   $valid['url'] = sanitize_url( $input['url'] );
   $valid['idsite'] = sanitize_text_field( $input['idsite'] );
+  $valid['tokenAuth'] = sanitize_text_field( $input['tokenAuth'] );
   return $valid;
 }

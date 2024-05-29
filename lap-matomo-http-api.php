@@ -2,7 +2,7 @@
 /*
  * Plugin Name:       LAP Matomo HTTP Tracking
  * Description:       Handle sending the page tracking to Matomo via HTTP rather than JavaScript.
- * Version:           1.1.2
+ * Version:           1.1.6
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            EncodeDotHost

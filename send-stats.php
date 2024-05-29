@@ -9,20 +9,49 @@ function lap_matomo_http_api_head() {
   if ($options['url'] !== false) {
     global $wp;
 
-    $url = ($options['url']);
-    $idsite = ($options['idsite']);
+    $matomoUrl = ($options['url']);
+    $matomoSiteId = ($options['idsite']);
+    $authToken = ($options['tokenAuth']);
     $tracking_args = 'rec=1';
     $queuedtracking = 0;
     $wp_url = esc_url('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     $page_title = esc_html(get_the_title());
-    $user_info = get_userdata(get_current_user_id());
-    $display_name = $user_info->display_name;
+    if (is_user_logged_in()) {
+      $user_info = get_userdata(get_current_user_id());
+      $display_name = $user_info->display_name;
+    }
     // echo $display_name;
+    if (current_user_can('administrator')) {
+      echo '<details>';
+      echo '<summary>Debugging</summary>';
+      print_r($_SERVER);
+      echo '<br>';
+      echo 'Server: ' . $_SERVER['REMOTE_ADDR'];
+      echo '<br>';
+      echo 'User: ' . $display_name;
+      echo '<br>';
+      echo 'URL: ' . $matomoUrl . '<br>';
+      echo 'Site: ' . $matomoSiteId . '<br>';
+      echo 'Auth: ' . $authToken;
+      echo '</details>';
+    }
+    $connecting_ip = $_SERVER['REMOTE_ADDR'];
 
     MatomoTracker::$URL = $url;
-    $matomoTracker = new MatomoTracker( $idSite = $idsite );
+    $matomoTracker = new MatomoTracker($matomoSiteId, $matomoUrl );
+    $matomoTracker->setRequestTimeout(2);
+    $matomoTracker->setTokenAuth($authToken);
+    $matomoTracker->setRequestMethodNonBulk('POST');
+    if (is_user_logged_in()) {
+      $matomoTracker->setUserId($display_name);
+    }
+    $matomoTracker->setIp($connecting_ip);
     $matomoTracker->doTrackPageView( $page_title );
-    $matomoTracker->setUserId($display_name);
-    $matomoTracker->ip = $_SERVER['REMOTE_ADDR'];
+  }
+  if (current_user_can('administrator')) {
+    echo '<details>';
+    echo '<summary>Debugging 2</summary>';
+    echo $matomoTracker->$response;
+    echo '</details>';
   }
 }
