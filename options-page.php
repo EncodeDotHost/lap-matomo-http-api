@@ -3,7 +3,7 @@
 // Add a menu item to the admin menu
 add_action( 'admin_menu', 'lap_matomo_http_api_add_settings_menu');
 function lap_matomo_http_api_add_settings_menu() {
-  add_options_page('Matomo Server Side Tracking', 'LAP Matomo HTTP Tracking', 'manage_options', 'lap_matomo_http_api', 'lap_matomo_http_api_options_page' );
+  add_options_page('Matomo Server Side Tracking', 'Matomo Server Side Tracking', 'manage_options', 'lap_matomo_http_api', 'lap_matomo_http_api_options_page' );
 }
 
 // Create the options page
