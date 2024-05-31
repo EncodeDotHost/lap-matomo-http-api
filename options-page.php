@@ -3,14 +3,14 @@
 // Add a menu item to the admin menu
 add_action( 'admin_menu', 'lap_matomo_http_api_add_settings_menu');
 function lap_matomo_http_api_add_settings_menu() {
-  add_options_page('LAP Matomo HTTP Tracking', 'LAP Matomo HTTP Tracking', 'manage_options', 'lap_matomo_http_api', 'lap_matomo_http_api_options_page' );
+  add_options_page('Matomo Server Side Tracking', 'LAP Matomo HTTP Tracking', 'manage_options', 'lap_matomo_http_api', 'lap_matomo_http_api_options_page' );
 }
 
 // Create the options page
 function lap_matomo_http_api_options_page() {
   ?>
   <div class="wrap">
-    <h1>LAP Matomo HTTP Tracking</h1>
+    <h1>Matomo Server Side Tracking</h1>
     <form method="post" action="options.php">
       <?php settings_fields( 'lap_matomo_http_api_options' ); ?>
       <?php do_settings_sections( 'lap_matomo_http_api_plugin' ); ?>
@@ -64,6 +64,13 @@ function lap_matomo_http_api_admin_init() {
     'lap_matomo_http_api_plugin',
     'lap_matomo_http_api_main'
   );
+  add_settings_field( 
+    'lap_matomo_http_api_tracking_debugging',
+    'Enable Debugging Mode?',
+    'lap_matomo_http_api_setting_tracking_debugging',
+    'lap_matomo_http_api_plugin',
+    'lap_matomo_http_api_main'
+  );
 }
 
 // Draw the section header
@@ -95,7 +102,15 @@ function lap_matomo_http_api_setting_tracking_tokenAuth() {
   $options = get_option( 'lap_matomo_http_api_options' );
   $tokenAuth = (isset($options['tokenAuth'])) ? $options['tokenAuth'] : ''; // Use empty string if not set
   ?>
-  <input type="text" name="lap_matomo_http_api_options[tokenAuth]" id="tokenAuth" value="<?php echo $tokenAuth; ?>" />
+  <input type="password" name="lap_matomo_http_api_options[tokenAuth]" id="tokenAuth" value="<?php echo $tokenAuth; ?>" />
+  <?php
+}
+
+function lap_matomo_http_api_setting_tracking_debugging() {
+  $options = get_option( 'lap_matomo_http_api_options' );
+  $debugging = isset( $options['debugging'] ) && $options['debugging'] === '1' ? 'checked' : '';
+  ?>
+  <input type="checkbox" name="lap_matomo_http_api_options[debugging]" id="debugging" value="1" <?php echo $debugging; ?> />
   <?php
 }
 
@@ -105,5 +120,6 @@ function lap_matomo_http_api_validate_options( $input ) {
   $valid['url'] = sanitize_url( $input['url'] );
   $valid['idsite'] = sanitize_text_field( $input['idsite'] );
   $valid['tokenAuth'] = sanitize_text_field( $input['tokenAuth'] );
+  $valid['debugging'] = sanitize_text_field( $input['debugging']);
   return $valid;
 }
