@@ -26,6 +26,7 @@ function lap_matomo_http_api_js() {
     $url    = esc_js( trailingslashit( $options['url'] ) );
     $idsite = esc_js( $options['idsite'] );
     ?>
+
 <!-- Matomo -->
 <script>
   var _paq = window._paq = window._paq || [];
