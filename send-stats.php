@@ -8,11 +8,16 @@ add_action( 'wp_head', 'lap_matomo_http_api_js' );
 add_action( 'wp_body_open' , 'lap_matomo_http_api_head' );
 
 function lap_matomo_http_api_js() {
-  if ( is_admin() || current_user_can( 'manage_options' ) ) {
+  if ( is_admin() ) {
     return;
   }
 
   $options = get_option( 'lap_matomo_http_api_options' );
+
+  if ( current_user_can( 'manage_options' ) && empty( $options['track_admins'] ) ) {
+    return;
+  }
+
   if ( empty( $options['enable_js'] ) || $options['enable_js'] !== '1' ) {
     return;
   }
@@ -41,13 +46,17 @@ function lap_matomo_http_api_js() {
 }
 
 function lap_matomo_http_api_head() {
-  if ( is_admin() || current_user_can( 'manage_options' ) ) {
+  if ( is_admin() ) {
     return;
   }
 
   include_once plugin_dir_path( __FILE__ ) .'MatomoTracker.php';
 
   $options = get_option( 'lap_matomo_http_api_options' );
+
+  if ( current_user_can( 'manage_options' ) && empty( $options['track_admins'] ) ) {
+    return;
+  }
   if (!empty($options['url']) && !empty($options['idsite']) && !empty($options['tokenAuth'])) {
     $matomoUrl = $options['url'];
     $matomoSiteId = $options['idsite'];
