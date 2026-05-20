@@ -82,6 +82,13 @@ function lap_matomo_http_api_admin_init() {
     'lap_matomo_http_api_plugin',
     'lap_matomo_http_api_main'
   );
+  add_settings_field(
+    'lap_matomo_http_api_track_admins',
+    'Track Admin Users?',
+    'lap_matomo_http_api_setting_track_admins',
+    'lap_matomo_http_api_plugin',
+    'lap_matomo_http_api_main'
+  );
 }
 
 // Draw the section header
@@ -133,6 +140,14 @@ function lap_matomo_http_api_setting_enable_js() {
   <?php
 }
 
+function lap_matomo_http_api_setting_track_admins() {
+  $options = get_option( 'lap_matomo_http_api_options' );
+  $track_admins = isset( $options['track_admins'] ) && $options['track_admins'] === '1' ? 'checked' : '';
+  ?>
+  <input type="checkbox" name="lap_matomo_http_api_options[track_admins]" id="track_admins" value="1" <?php echo $track_admins; ?> />
+  <?php
+}
+
 function lap_matomo_http_api_validate_options( $input ) {
 
   $valid['url'] = esc_url_raw( $input['url'] );
@@ -140,5 +155,6 @@ function lap_matomo_http_api_validate_options( $input ) {
   $valid['tokenAuth'] = sanitize_text_field( $input['tokenAuth'] );
   $valid['debugging'] = sanitize_text_field( $input['debugging'] ?? '' );
   $valid['enable_js'] = sanitize_text_field( $input['enable_js'] ?? '' );
+  $valid['track_admins'] = sanitize_text_field( $input['track_admins'] ?? '' );
   return $valid;
 }
