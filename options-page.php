@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+  exit;
+}
+
 // Add a menu item to the admin menu
 add_action( 'admin_menu', 'lap_matomo_http_api_add_settings_menu');
 function lap_matomo_http_api_add_settings_menu() {
@@ -64,10 +68,17 @@ function lap_matomo_http_api_admin_init() {
     'lap_matomo_http_api_plugin',
     'lap_matomo_http_api_main'
   );
-  add_settings_field( 
+  add_settings_field(
     'lap_matomo_http_api_tracking_debugging',
     'Enable Debugging Mode?',
     'lap_matomo_http_api_setting_tracking_debugging',
+    'lap_matomo_http_api_plugin',
+    'lap_matomo_http_api_main'
+  );
+  add_settings_field(
+    'lap_matomo_http_api_enable_js',
+    'Enable Client-Side JS Tracking?',
+    'lap_matomo_http_api_setting_enable_js',
     'lap_matomo_http_api_plugin',
     'lap_matomo_http_api_main'
   );
@@ -114,11 +125,20 @@ function lap_matomo_http_api_setting_tracking_debugging() {
   <?php
 }
 
+function lap_matomo_http_api_setting_enable_js() {
+  $options = get_option( 'lap_matomo_http_api_options' );
+  $enable_js = isset( $options['enable_js'] ) && $options['enable_js'] === '1' ? 'checked' : '';
+  ?>
+  <input type="checkbox" name="lap_matomo_http_api_options[enable_js]" id="enable_js" value="1" <?php echo $enable_js; ?> />
+  <?php
+}
+
 function lap_matomo_http_api_validate_options( $input ) {
 
   $valid['url'] = esc_url_raw( $input['url'] );
   $valid['idsite'] = sanitize_text_field( $input['idsite'] );
   $valid['tokenAuth'] = sanitize_text_field( $input['tokenAuth'] );
-  $valid['debugging'] = sanitize_text_field( $input['debugging']);
+  $valid['debugging'] = sanitize_text_field( $input['debugging'] ?? '' );
+  $valid['enable_js'] = sanitize_text_field( $input['enable_js'] ?? '' );
   return $valid;
 }
