@@ -1,6 +1,35 @@
 <?php
 
+add_action( 'wp_head', 'lap_matomo_http_api_js' );
 add_action( 'wp_body_open' , 'lap_matomo_http_api_head' );
+
+function lap_matomo_http_api_js() {
+  if (is_admin()) {
+    return;
+  }
+
+  $options = get_option( 'lap_matomo_http_api_options' );
+  if (!empty($options['url']) && !empty($options['idsite'])) {
+    $url    = esc_js( trailingslashit( $options['url'] ) );
+    $idsite = esc_js( $options['idsite'] );
+    ?>
+<!-- Matomo -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  _paq.push(["disableCookies"]);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="<?php echo $url; ?>";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '<?php echo $idsite; ?>']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+    <?php
+  }
+}
 
 function lap_matomo_http_api_head() {
   if (is_admin()) {
@@ -11,8 +40,6 @@ function lap_matomo_http_api_head() {
 
   $options = get_option( 'lap_matomo_http_api_options' );
   if (!empty($options['url']) && !empty($options['idsite']) && !empty($options['tokenAuth'])) {
-    global $wp;
-
     $matomoUrl = $options['url'];
     $matomoSiteId = $options['idsite'];
     $authToken = $options['tokenAuth'];
