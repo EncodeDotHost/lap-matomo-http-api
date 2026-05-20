@@ -86,7 +86,7 @@ function lap_matomo_http_api_setting_tracking_url() {
   $options = get_option( 'lap_matomo_http_api_options' );
   $url = (isset($options['url'])) ? $options['url'] : ''; // Use empty string if not set
   ?>
-  <input type="text" name="lap_matomo_http_api_options[url]" id="url" value="<?php echo $url; ?>" />
+  <input type="text" name="lap_matomo_http_api_options[url]" id="url" value="<?php echo esc_attr( $url ); ?>" />
   <?php
 }
 
@@ -94,7 +94,7 @@ function lap_matomo_http_api_setting_tracking_idsite() {
   $options = get_option( 'lap_matomo_http_api_options' );
   $idsite = (isset($options['idsite'])) ? $options['idsite'] : ''; // Use empty string if not set
   ?>
-  <input type="text" name="lap_matomo_http_api_options[idsite]" id="idsite" value="<?php echo $idsite; ?>" />
+  <input type="text" name="lap_matomo_http_api_options[idsite]" id="idsite" value="<?php echo esc_attr( $idsite ); ?>" />
   <?php
 }
 
@@ -102,7 +102,7 @@ function lap_matomo_http_api_setting_tracking_tokenAuth() {
   $options = get_option( 'lap_matomo_http_api_options' );
   $tokenAuth = (isset($options['tokenAuth'])) ? $options['tokenAuth'] : ''; // Use empty string if not set
   ?>
-  <input type="password" name="lap_matomo_http_api_options[tokenAuth]" id="tokenAuth" value="<?php echo $tokenAuth; ?>" />
+  <input type="password" name="lap_matomo_http_api_options[tokenAuth]" id="tokenAuth" value="<?php echo esc_attr( $tokenAuth ); ?>" />
   <?php
 }
 
@@ -116,8 +116,7 @@ function lap_matomo_http_api_setting_tracking_debugging() {
 
 function lap_matomo_http_api_validate_options( $input ) {
 
-	// Only allow letters and spaces for the name
-  $valid['url'] = sanitize_url( $input['url'] );
+  $valid['url'] = esc_url_raw( $input['url'] );
   $valid['idsite'] = sanitize_text_field( $input['idsite'] );
   $valid['tokenAuth'] = sanitize_text_field( $input['tokenAuth'] );
   $valid['debugging'] = sanitize_text_field( $input['debugging']);
