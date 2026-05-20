@@ -18,6 +18,7 @@ function lap_matomo_http_api_js() {
   var _paq = window._paq = window._paq || [];
   _paq.push(["disableCookies"]);
   _paq.push(['enableLinkTracking']);
+  _paq.push(['enableHeartBeatTimer', 15]);
   (function() {
     var u="<?php echo $url; ?>";
     _paq.push(['setTrackerUrl', u+'matomo.php']);
