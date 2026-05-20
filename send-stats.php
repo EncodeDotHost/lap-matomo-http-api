@@ -1,14 +1,22 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+  exit;
+}
+
 add_action( 'wp_head', 'lap_matomo_http_api_js' );
 add_action( 'wp_body_open' , 'lap_matomo_http_api_head' );
 
 function lap_matomo_http_api_js() {
-  if (is_admin()) {
+  if ( is_admin() || current_user_can( 'manage_options' ) ) {
     return;
   }
 
   $options = get_option( 'lap_matomo_http_api_options' );
+  if ( empty( $options['enable_js'] ) || $options['enable_js'] !== '1' ) {
+    return;
+  }
+
   if (!empty($options['url']) && !empty($options['idsite'])) {
     $url    = esc_js( trailingslashit( $options['url'] ) );
     $idsite = esc_js( $options['idsite'] );
@@ -33,7 +41,7 @@ function lap_matomo_http_api_js() {
 }
 
 function lap_matomo_http_api_head() {
-  if (is_admin()) {
+  if ( is_admin() || current_user_can( 'manage_options' ) ) {
     return;
   }
 
@@ -52,7 +60,7 @@ function lap_matomo_http_api_head() {
       $display_name = $user_info->display_name;
     }
 
-    if (current_user_can('administrator') && $debugging === '1') {
+    if (current_user_can('manage_options') && $debugging === '1') {
       echo '<details>';
       echo '<summary>Debugging</summary>';
       echo 'Server: ' . esc_html($_SERVER['REMOTE_ADDR']);
@@ -65,6 +73,12 @@ function lap_matomo_http_api_head() {
       echo '</details>';
     }
     $connecting_ip = $_SERVER['REMOTE_ADDR'];
+    if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $_SERVER ) ) {
+      $forwarded_ips = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
+      $connecting_ip = trim( $forwarded_ips[0] );
+    } elseif ( array_key_exists( 'HTTP_CF_CONNECTING_IP', $_SERVER ) ) {
+      $connecting_ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
+    }
     try {
       $matomoTracker = new MatomoTracker($matomoSiteId, $matomoUrl);
       $matomoTracker->setRequestTimeout(2);
@@ -77,7 +91,7 @@ function lap_matomo_http_api_head() {
       $matomoTracker->doTrackPageView( $page_title );
     } catch (Exception $e) {
       error_log('Matomo tracking error: ' . $e->getMessage());
-      if (current_user_can('administrator') && $debugging === '1') {
+      if (current_user_can('manage_options') && $debugging === '1') {
         echo '<details>';
         echo '<summary>Debugging</summary>';
         echo 'Message: ' . esc_html($e->getMessage());
