@@ -19,3 +19,10 @@
 
 include_once plugin_dir_path( __FILE__ ) .'options-page.php';
 include_once plugin_dir_path( __FILE__ ) .'send-stats.php';
+
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'lap_matomo_http_api_action_links' );
+function lap_matomo_http_api_action_links( $links ) {
+  $settings_link = '<a href="' . admin_url( 'options-general.php?page=lap_matomo_http_api' ) . '">Settings</a>';
+  array_unshift( $links, $settings_link );
+  return $links;
+}
