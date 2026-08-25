@@ -70,18 +70,6 @@ function lap_matomo_http_api_head() {
       $display_name = $user_info->display_name;
     }
 
-    if (current_user_can('manage_options') && $debugging === '1') {
-      echo '<details>';
-      echo '<summary>Debugging</summary>';
-      echo 'Server: ' . esc_html($_SERVER['REMOTE_ADDR']);
-      echo '<br>';
-      echo 'User: ' . esc_html($display_name);
-      echo '<br>';
-      echo 'URL: ' . esc_html($matomoUrl) . '<br>';
-      echo 'Site: ' . esc_html($matomoSiteId) . '<br>';
-      echo 'Page Title: '. esc_html($page_title). '<br>';
-      echo '</details>';
-    }
     $connecting_ip = $_SERVER['REMOTE_ADDR'];
     if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $_SERVER ) ) {
       $forwarded_ips = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
@@ -98,16 +86,33 @@ function lap_matomo_http_api_head() {
         $matomoTracker->setUserId($display_name);
       }
       $matomoTracker->setIp($connecting_ip);
-      $matomoTracker->doTrackPageView( $page_title );
-    } catch (Exception $e) {
-      error_log('Matomo tracking error: ' . $e->getMessage());
-      if (current_user_can('manage_options') && $debugging === '1') {
-        echo '<details>';
-        echo '<summary>Debugging</summary>';
-        echo 'Message: ' . esc_html($e->getMessage());
-        echo '</details>';
+      $response = $matomoTracker->doTrackPageView( $page_title );
+      // Matomo answers a successful tracking request with a 1x1 GIF.
+      if (is_string($response) && strpos($response, 'GIF') === 0) {
+        $status = 'OK - Matomo accepted the page view';
+      } elseif ($response === '' || $response === false || $response === null) {
+        $status = 'Failed - empty response from Matomo (check URL, token_auth and site ID)';
+        error_log('Matomo tracking error: empty response for site ' . $matomoSiteId);
+      } else {
+        $status = 'Failed - Matomo replied: ' . wp_strip_all_tags(substr($response, 0, 300));
+        error_log('Matomo tracking error: ' . substr($response, 0, 300));
       }
+    } catch (Exception $e) {
+      $status = 'Failed - ' . $e->getMessage();
+      error_log('Matomo tracking error: ' . $e->getMessage());
+    }
 
+    if (current_user_can('manage_options') && $debugging === '1') {
+      echo '<details>';
+      echo '<summary>Debugging</summary>';
+      echo 'Status: ' . esc_html($status) . '<br>';
+      echo 'Server: ' . esc_html($_SERVER['REMOTE_ADDR']) . '<br>';
+      echo 'Visitor IP: ' . esc_html($connecting_ip) . '<br>';
+      echo 'User: ' . esc_html($display_name) . '<br>';
+      echo 'URL: ' . esc_html($matomoUrl) . '<br>';
+      echo 'Site: ' . esc_html($matomoSiteId) . '<br>';
+      echo 'Page Title: '. esc_html($page_title). '<br>';
+      echo '</details>';
     }
   }
 
